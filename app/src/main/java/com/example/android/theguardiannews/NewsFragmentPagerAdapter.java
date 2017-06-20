@@ -30,6 +30,8 @@ public class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
         super(fm);
     }
 
+
+
     @Override
     public CharSequence getPageTitle(int position) {
         return titles[position];

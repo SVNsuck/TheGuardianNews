@@ -88,7 +88,7 @@ public class MusicFragment extends Fragment implements LoaderManager.LoaderCallb
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                News currentNews = (News) mNewsAdapter.getItem(position);
+                News currentNews = mNewsAdapter.getItem(position);
 
                 Uri newsUri = Uri.parse(currentNews.getWebUrl());
 
@@ -110,10 +110,6 @@ public class MusicFragment extends Fragment implements LoaderManager.LoaderCallb
 
         //隐藏加载圈圈
         bar.setVisibility(View.GONE);
-
-        //显示listview
-        ListView listView =(ListView)getActivity().findViewById(R.id.list);
-        listView.setVisibility(View.VISIBLE);
 
         //初始化Adapter
         mNewsAdapter = new NewsAdapter(getActivity(), data, mNewsListView);

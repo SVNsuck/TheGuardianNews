@@ -111,10 +111,6 @@ public class ScienceFragment extends Fragment implements LoaderManager.LoaderCal
         //隐藏加载圈圈
         bar.setVisibility(View.GONE);
 
-        //显示listview
-        ListView listView =(ListView)getActivity().findViewById(R.id.list);
-        listView.setVisibility(View.VISIBLE);
-
         //初始化Adapter
         mNewsAdapter = new NewsAdapter(getActivity(), data, mNewsListView);
 
