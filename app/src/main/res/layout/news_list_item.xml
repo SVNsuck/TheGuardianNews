@@ -10,7 +10,7 @@
         android:layout_width="@dimen/zero"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/item_marginTop"
         android:layout_marginStart="@dimen/linearLay_margin"
         android:layout_marginEnd="@dimen/linearLay_margin"
         android:layout_weight="1"
@@ -37,8 +37,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="@dimen/publishDate_marginTop"
+            android:layout_marginBottom="@dimen/publishDate_marginBottom"
             android:orientation="horizontal">
 
             <TextView
