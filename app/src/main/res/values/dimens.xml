@@ -8,4 +8,7 @@
     <dimen name="smallSize">12sp</dimen>
     <dimen name="normalSize">16sp</dimen>
     <dimen name="text_margin">8dp</dimen>
+    <dimen name="item_marginTop">4dp</dimen>
+    <dimen name="publishDate_marginTop">4dp</dimen>
+    <dimen name="publishDate_marginBottom">10dp</dimen>
 </resources>
