@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,9 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class AndroidFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<News>> {
+
+    private static final String TAG = "AndroidFragment";
+    
     /**
      * 请求地址
      */
@@ -37,6 +42,11 @@ public class AndroidFragment extends Fragment implements LoaderManager.LoaderCal
     private ListView mNewsListView;
 
     /**
+     * LRU缓存
+     */
+    private LruCache<String, List<News>> mMemoryCaches;
+
+    /**
      * 列表为空时显示的 TextView
      */
     private TextView mEmptyStateTextView;
@@ -44,13 +54,23 @@ public class AndroidFragment extends Fragment implements LoaderManager.LoaderCal
     private View bar;
 
     public AndroidFragment() {
-        // Required empty public constructor
+
+        //最大内存
+        int maxMemory = (int)Runtime.getRuntime().maxMemory();
+        //缓存大小
+        int cacheSizes = maxMemory/5;
+        //初始化缓存
+        mMemoryCaches = new LruCache<>(cacheSizes);
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.i(TAG, "onCreateView: androidFrag");
+
+
 
         View rootView = inflater.inflate(R.layout.news_list_activity, container, false);
 
@@ -104,7 +124,7 @@ public class AndroidFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(getContext(),REQ_URL,mNewsListView);
+        return new NewsLoader(getContext(),REQ_URL,mMemoryCaches);
     }
 
     @Override

@@ -32,23 +32,10 @@ public class NewsLoader extends AsyncTaskLoader {
      */
     private LruCache<String, List<News>> mMemoryCaches;
 
-    /**
-     *
-     */
-    private ListView mListView;
-
-    public NewsLoader(Context context,String url, ListView listView){
+    public NewsLoader(Context context,String url, LruCache memoryCaches){
         super(context);
         this.mUrl = url;
-
-        this.mListView = listView;
-
-        //最大内存
-        int maxMemory = (int)Runtime.getRuntime().maxMemory();
-        //缓存大小
-        int cacheSizes = maxMemory/5;
-        //初始化缓存
-        mMemoryCaches = new LruCache<>(cacheSizes);
+        this.mMemoryCaches = memoryCaches;
     }
 
     /**

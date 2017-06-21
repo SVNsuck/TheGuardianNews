@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,21 +24,29 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class ScienceFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<News>> {
+
+    private static final String TAG = "ScienceFragment";
+    
     /**
      * 请求地址
      */
     private static final String REQ_URL = "http://content.guardianapis.com/search?tag=science/science&from-date=2014-01-01&api-key=test";
 
-    /**
-     * loader的ID
-     */
-    private static final int SCIENCE_NEWS_LOADER_ID = 2;
-
     private NewsAdapter mNewsAdapter;
 
     private ListView mNewsListView;
 
+    /**
+     * LRU缓存
+     */
+    private LruCache<String, List<News>> mMemoryCaches;
+
     private View bar;
+
+    /**
+     * loader的ID
+     */
+    private static final int SCIENCE_NEWS_LOADER_ID = 2;
 
     /**
      * 列表为空时显示的 TextView
@@ -44,13 +54,22 @@ public class ScienceFragment extends Fragment implements LoaderManager.LoaderCal
     private TextView mEmptyStateTextView;
 
     public ScienceFragment() {
-        // Required empty public constructor
+
+        //最大内存
+        int maxMemory = (int)Runtime.getRuntime().maxMemory();
+        //缓存大小
+        int cacheSizes = maxMemory/5;
+        //初始化缓存
+        mMemoryCaches = new LruCache<>(cacheSizes);
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: scienceFrag");
+        
         View rootView = inflater.inflate(R.layout.news_list_activity, container, false);
 
         mNewsListView = (ListView)rootView.findViewById(R.id.list);
@@ -102,7 +121,7 @@ public class ScienceFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(getContext(), REQ_URL, mNewsListView);
+        return new NewsLoader(getContext(), REQ_URL, mMemoryCaches);
     }
 
     @Override

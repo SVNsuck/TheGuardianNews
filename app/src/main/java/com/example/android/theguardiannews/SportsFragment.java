@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,9 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class SportsFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<News>> {
+
+    private static final String TAG = "SportsFragment";
+    
     /**
      * 请求地址
      */
@@ -30,6 +35,11 @@ public class SportsFragment extends Fragment implements LoaderManager.LoaderCall
     private NewsAdapter mNewsAdapter;
 
     private ListView mNewsListView;
+
+    /**
+     * LRU缓存
+     */
+    private LruCache<String, List<News>> mMemoryCaches;
 
     private View bar;
 
@@ -45,13 +55,22 @@ public class SportsFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     public SportsFragment() {
-        // Required empty public constructor
+
+        //最大内存
+        int maxMemory = (int)Runtime.getRuntime().maxMemory();
+        //缓存大小
+        int cacheSizes = maxMemory/5;
+        //初始化缓存
+        mMemoryCaches = new LruCache<>(cacheSizes);
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: sportsFrag");
+        
         View rootView = inflater.inflate(R.layout.news_list_activity, container, false);
 
         mNewsListView = (ListView)rootView.findViewById(R.id.list);
@@ -103,7 +122,7 @@ public class SportsFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(getContext(), REQ_URL, mNewsListView);
+        return new NewsLoader(getContext(), REQ_URL, mMemoryCaches);
     }
 
     @Override
