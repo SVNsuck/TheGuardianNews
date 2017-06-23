@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ScienceFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<News>> {
+public class ScienceFragment extends SuperFragment {
 
     private static final String TAG = "ScienceFragment";
     
@@ -32,113 +32,23 @@ public class ScienceFragment extends Fragment implements LoaderManager.LoaderCal
      */
     private static final String REQ_URL = "http://content.guardianapis.com/search?tag=science/science&from-date=2014-01-01&api-key=test";
 
-    private NewsAdapter mNewsAdapter;
-
-    private ListView mNewsListView;
-
-    /**
-     * LRU缓存
-     */
-    private LruCache<String, List<News>> mMemoryCaches;
-
-    private View bar;
-
     /**
      * loader的ID
      */
     private static final int SCIENCE_NEWS_LOADER_ID = 2;
 
-    /**
-     * 列表为空时显示的 TextView
-     */
-    private TextView mEmptyStateTextView;
-
-    public ScienceFragment() {
-
-        //最大内存
-        int maxMemory = (int)Runtime.getRuntime().maxMemory();
-        //缓存大小
-        int cacheSizes = maxMemory/5;
-        //初始化缓存
-        mMemoryCaches = new LruCache<>(cacheSizes);
-
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView: scienceFrag");
-        
-        View rootView = inflater.inflate(R.layout.news_list_activity, container, false);
-
-        mNewsListView = (ListView)rootView.findViewById(R.id.list);
-
-        //设置ListView内容为空时显示的layout
-        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
-        mNewsListView.setEmptyView(mEmptyStateTextView);
-
-        //将空页面的文字清空
-        mEmptyStateTextView.setText("");
-        //如果无网络连接,则显示空页面
-        ConnectivityManager cm =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        //得到加载圈圈实体
-        bar = rootView.findViewById(R.id.pro_bar);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-        if(isConnected){
-            //显示加载圈圈
-            bar.setVisibility(View.VISIBLE);
-
-            //每次点击都先将Loader销毁,不然这该死onCreateLoader方法只会在Loader初始化的时候调用一次,
-            // 导致更新后的url传不到GBookLoader实例中,使得后面的搜索都不起作用了
-            getActivity().getSupportLoaderManager().destroyLoader(SCIENCE_NEWS_LOADER_ID);
-            //启动线程
-            getActivity().getSupportLoaderManager().initLoader(SCIENCE_NEWS_LOADER_ID, null, ScienceFragment.this);
-        }else{
-            mEmptyStateTextView.setText(R.string.no_network);
-        }
-
-        //设置listView 中的item的点击事件
-        mNewsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                News currentNews = mNewsAdapter.getItem(position);
-
-                Uri newsUri = Uri.parse(currentNews.getWebUrl());
-
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW,newsUri);
-
-                getActivity().startActivity(websiteIntent);
-            }
-        });
-        return rootView;
+    public String getReqUrl() {
+        return REQ_URL;
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(getContext(), REQ_URL, mMemoryCaches);
+    public int getAndroidNewsLoaderId() {
+        return SCIENCE_NEWS_LOADER_ID;
     }
 
     @Override
-    public void onLoadFinished(Loader<List<News>> loader, List<News> data) {
-
-        //隐藏加载圈圈
-        bar.setVisibility(View.GONE);
-
-        //初始化Adapter
-        mNewsAdapter = new NewsAdapter(getActivity(), data, mNewsListView);
-
-        //设置adapter
-        mNewsListView.setAdapter(mNewsAdapter);
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-
+    public int getRootViewId() {
+        return R.layout.news_list_activity;
     }
 }
